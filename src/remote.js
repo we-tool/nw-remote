@@ -1,7 +1,18 @@
 /* global Peer */
 const uuid = require('node-uuid')
-const mediaConfig = require('./mediaConfig')
 const peerConfig = require('./peerConfig')
+const mediaConfig = {
+  audio: false,
+  video: {
+    mandatory: {
+      chromeMediaSource: 'desktop',
+      chromeMediaSourceId: 'screen:0',
+      maxWidth: 1,
+      maxHeight: 1,
+      maxFrameRate: 1, // minimum
+    }
+  }
+}
 
 const peerId = uuid()
 const peer = new Peer(peerId, peerConfig)

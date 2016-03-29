@@ -1,8 +1,19 @@
 /* global Peer */
 const gui = require('nw.gui')
 const uuid = require('node-uuid')
-const mediaConfig = require('./mediaConfig')
 const peerConfig = require('./peerConfig')
+const mediaConfig = {
+  audio: false,
+  video: {
+    mandatory: {
+      chromeMediaSource: 'desktop',
+      chromeMediaSourceId: 'screen:0',
+      maxWidth: 960,
+      maxHeight: 540,
+      maxFrameRate: 60,
+    }
+  }
+}
 
 const peerId = uuid()
 const peer = new Peer(peerId, peerConfig)
@@ -15,8 +26,8 @@ peer.on('open', function (id) {
 btnJoin.addEventListener('click', function () {
   const targetId = txtTargetId.value.trim()
   gui.Window.open(`./remote.html?targetId=${targetId}`, {
-    width: 960,
-    height: 540,
+    width: 1000,
+    height: 600,
   })
 })
 
