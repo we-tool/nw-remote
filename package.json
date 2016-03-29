@@ -1,0 +1,13 @@
+{
+  "name": "nw-remote",
+  "main": "src/main.html",
+  "window": {
+    "show": false
+  },
+  "dependencies": {
+    "node-uuid": "^1.4.7"
+  },
+  "optionalDependencies": {
+    "robotjs": "^0.3.0"
+  }
+}
