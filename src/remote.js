@@ -14,10 +14,15 @@ const mediaConfig = {
   }
 }
 
+const targetId = location.search.match(/[?&]targetId=([\w\-]+)/)[1]
 const peerId = uuid()
 const peer = new Peer(peerId, peerConfig)
+const conn = peer.connect(targetId)
 
-const targetId = location.search.match(/[?&]targetId=([\w\-]+)/)[1]
+conn.on('open', function () {
+  console.log('conn onOpen')
+})
+
 txtTargetId.textContent = `TargetId: ${targetId}`
 
 
@@ -33,4 +38,30 @@ navigator.webkitGetUserMedia(mediaConfig, function (stream) {
 }, function (err) {
   console.error('getUserMedia', err)
 })
+
+
+vidScreen.addEventListener('mousedown', function (e) {
+  const data = getMouseData(e)
+  data.mouse = 'down'
+  data.which = e.which
+  console.log('conn send', data)
+  conn.send(data)
+})
+vidScreen.addEventListener('mouseup', function (e) {
+  const data = getMouseData(e)
+  data.mouse = 'up'
+  data.which = e.which
+  console.log('conn send', data)
+  conn.send(data)
+})
+
+function getMouseData(e) {
+  const data = {}
+  const rect = vidScreen.getBoundingClientRect()
+  data.width = rect.width
+  data.height = rect.height
+  data.x = e.clientX - rect.left
+  data.y = e.clientY - rect.top
+  return data
+}
 
