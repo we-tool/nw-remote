@@ -2,13 +2,21 @@
 const gui = require('nw.gui')
 const robot = require('robotjs')
 const uuid = require('node-uuid')
-const peerConfig = require('./peerConfig')
+const fixMacMenu = require('./util').fixMacMenu
+const peerConfig = require('./util').peerConfig
+
+gui.Screen.Init()
+gui.Window.get().focus()
+
 const mediaConfig = {
   audio: false,
   video: {
     mandatory: {
       chromeMediaSource: 'desktop',
-      chromeMediaSourceId: 'screen:0',
+      // fixme: multi-screen chooseDesktopMedia
+      // https://github.com/nwjs/nw.js/wiki/Screen#screenchoosedesktopmedia-array-of-desktopcapturesourcetype-sources-function-callback
+      // chromeMediaSourceId: 'screen:0',
+      chromeMediaSourceId: `screen:${gui.Screen.screens[0].id}`,
       maxWidth: 960,
       maxHeight: 540,
       maxFrameRate: 60,
@@ -19,6 +27,8 @@ const mediaConfig = {
 gui.Window.get().on('closed', function () {
   gui.App.quit()
 })
+
+fixMacMenu(gui)
 
 
 const peerId = uuid()

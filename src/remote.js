@@ -1,12 +1,19 @@
 /* global Peer */
+const gui = require('nw.gui')
 const uuid = require('node-uuid')
-const peerConfig = require('./peerConfig')
+const fixMacMenu = require('./util').fixMacMenu
+const peerConfig = require('./util').peerConfig
+
+gui.Screen.Init()
+gui.Window.get().focus()
+
 const mediaConfig = {
   audio: false,
   video: {
     mandatory: {
       chromeMediaSource: 'desktop',
-      chromeMediaSourceId: 'screen:0',
+      // chromeMediaSourceId: 'screen:0',
+      chromeMediaSourceId: `screen:${gui.Screen.screens[0].id}`,
       maxWidth: 1,
       maxHeight: 1,
       maxFrameRate: 1, // minimum
@@ -24,6 +31,8 @@ conn.on('open', function () {
 })
 
 txtTargetId.textContent = `TargetId: ${targetId}`
+
+fixMacMenu(gui)
 
 
 navigator.webkitGetUserMedia(mediaConfig, function (stream) {
