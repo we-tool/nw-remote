@@ -8,21 +8,6 @@ const peerConfig = require('./util').peerConfig
 gui.Screen.Init()
 gui.Window.get().focus()
 
-const mediaConfig = {
-  audio: false,
-  video: {
-    mandatory: {
-      chromeMediaSource: 'desktop',
-      // fixme: multi-screen chooseDesktopMedia
-      // https://github.com/nwjs/nw.js/wiki/Screen#screenchoosedesktopmedia-array-of-desktopcapturesourcetype-sources-function-callback
-      // chromeMediaSourceId: 'screen:0',
-      chromeMediaSourceId: `screen:${gui.Screen.screens[0].id}`,
-      maxWidth: 960,
-      maxHeight: 540,
-      maxFrameRate: 60,
-    }
-  }
-}
 
 gui.Window.get().on('closed', function () {
   gui.App.quit()
@@ -44,7 +29,7 @@ peer.on('connection', function (conn) {
   })
 
   conn.on('data', function (data) {
-    console.log('conn onData', data)
+    console.log('conn onData', JSON.stringify(data))
     if (data.mouse) {
       // 仅适用于"全屏"桌面分享
       const x = Math.round(data.x / data.width * screen.width)
@@ -67,15 +52,35 @@ btnJoin.addEventListener('click', function () {
   })
 })
 
+
 btnShare.addEventListener('click', function () {
-  navigator.webkitGetUserMedia(mediaConfig, function (stream) {
-    console.log('getUserMedia', stream)
-    txtHostId.textContent = `HostId: ${peerId}`
-    peer.on('call', function (call) {
-      console.log('peer onCall')
-      call.answer(stream)
+  gui.Screen.chooseDesktopMedia(['screen'], function (streamId) {
+    console.log('chooseDesktopMedia', streamId)
+    const mediaConfig = {
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          // fixme: multi-screen chooseDesktopMedia
+          // https://github.com/nwjs/nw.js/wiki/Screen#screenchoosedesktopmedia-array-of-desktopcapturesourcetype-sources-function-callback
+          // chromeMediaSourceId: 'screen:0',
+          // chromeMediaSourceId: `screen:${gui.Screen.screens[0].id}`,
+          chromeMediaSourceId: streamId,
+          maxWidth: 1920, // fixme: 更确切的maxWidth/Height
+          maxHeight: 1080,
+          maxFrameRate: 60,
+        }
+      }
+    }
+    navigator.webkitGetUserMedia(mediaConfig, function (stream) {
+      console.log('getUserMedia', stream)
+      txtHostId.textContent = `HostId: ${peerId}`
+      peer.on('call', function (call) {
+        console.log('peer onCall')
+        call.answer(stream)
+      })
+    }, function (err) {
+      console.error('getUserMedia', err)
     })
-  }, function (err) {
-    console.error('getUserMedia', err)
   })
 })

@@ -3,17 +3,19 @@ const gui = require('nw.gui')
 const uuid = require('node-uuid')
 const fixMacMenu = require('./util').fixMacMenu
 const peerConfig = require('./util').peerConfig
+const isWin32 = require('./util').isWin32
 
 gui.Screen.Init()
 gui.Window.get().focus()
 
+const screenId = isWin32 ? 0 : gui.Screen.screens[0].id // random screen
 const mediaConfig = {
   audio: false,
   video: {
     mandatory: {
       chromeMediaSource: 'desktop',
       // chromeMediaSourceId: 'screen:0',
-      chromeMediaSourceId: `screen:${gui.Screen.screens[0].id}`,
+      chromeMediaSourceId: `screen:${screenId}`,
       maxWidth: 1,
       maxHeight: 1,
       maxFrameRate: 1, // minimum
@@ -53,14 +55,14 @@ vidScreen.addEventListener('mousedown', function (e) {
   const data = getMouseData(e)
   data.mouse = 'down'
   data.which = e.which
-  console.log('conn send', data)
+  console.log('conn send', JSON.stringify(data))
   conn.send(data)
 })
 vidScreen.addEventListener('mouseup', function (e) {
   const data = getMouseData(e)
   data.mouse = 'up'
   data.which = e.which
-  console.log('conn send', data)
+  console.log('conn send', JSON.stringify(data))
   conn.send(data)
 })
 

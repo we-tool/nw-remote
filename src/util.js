@@ -1,4 +1,7 @@
 
+exports.isWin32 = process.platform === 'win32'
+
+
 // https://github.com/peers/peerjs-server
 exports.peerConfig = {
   host: 'localhost',
