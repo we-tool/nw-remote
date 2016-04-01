@@ -1,6 +1,8 @@
 /* global Peer */
+'use strict'
 const gui = require('nw.gui')
 const robot = require('robotjs')
+const vkey = require('vkey')
 const uuid = require('node-uuid')
 const fixMacMenu = require('./util').fixMacMenu
 const peerConfig = require('./util').peerConfig
@@ -39,6 +41,33 @@ peer.on('connection', function (conn) {
       robot.mouseToggle(data.mouse, button)
       console.log('robot moveMouse', x, y)
       console.log('robot mouseToggle', data.mouse, button)
+    }
+    if (data.keyCode) {
+      let k = vkey[data.keyCode].toLowerCase()
+      if (k === '<space>') k = ' '
+      const modifiers = []
+      if (data.meta) modifiers.push('command')
+      if (data.ctrl) modifiers.push('control')
+      if (data.alt) modifiers.push('alt')
+      if (data.shift) modifiers.push('shift')
+      if (k[0] !== '<') {
+        console.log('typed ' + k + ' ' + JSON.stringify(modifiers))
+        if (modifiers[0]) robot.keyTap(k, modifiers[0])
+        else robot.keyTap(k)
+      } else {
+        if (k === '<enter>') robot.keyTap('enter')
+        else if (k === '<backspace>') robot.keyTap('backspace')
+        else if (k === '<up>') robot.keyTap('up')
+        else if (k === '<down>') robot.keyTap('down')
+        else if (k === '<left>') robot.keyTap('left')
+        else if (k === '<right>') robot.keyTap('right')
+        else if (k === '<delete>') robot.keyTap('delete')
+        else if (k === '<home>') robot.keyTap('home')
+        else if (k === '<end>') robot.keyTap('end')
+        else if (k === '<page-up>') robot.keyTap('pageup')
+        else if (k === '<page-down>') robot.keyTap('pagedown')
+        else console.log('did not type ' + k)
+      }
     }
   })
 })

@@ -51,6 +51,19 @@ navigator.webkitGetUserMedia(mediaConfig, function (stream) {
 })
 
 
+// vidScreen上监听keydown无效
+// vidScreen.addEventListener('mousedown', function (e) {
+window.addEventListener('keydown', function (e) {
+  const data = {
+    keyCode: e.keyCode,
+    meta: e.metaKey,
+    ctrl: e.ctrlKey,
+    alt: e.altKey,
+    shift: e.shiftKey,
+  }
+  console.log('conn send', JSON.stringify(data))
+  conn.send(data)
+})
 vidScreen.addEventListener('mousedown', function (e) {
   const data = getMouseData(e)
   data.mouse = 'down'
