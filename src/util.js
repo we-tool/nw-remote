@@ -3,10 +3,10 @@ exports.isWin32 = process.platform === 'win32'
 
 
 // https://github.com/peers/peerjs-server
-exports.peerConfig = {
-  host: 'localhost',
-  port: 9000,
-}
+// exports.peerConfig = {
+//   host: 'localhost',
+//   port: 9000,
+// }
 
 
 // 解决: Cut/Copy/Paste hotkeys doesn't work on Mac

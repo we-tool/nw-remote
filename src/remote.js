@@ -24,9 +24,11 @@ const mediaConfig = {
   }
 }
 
+const host = location.search.match(/[?&]host=([\w\-]+)/)[1]
+const port = +location.search.match(/[?&]port=([\w\-]+)/)[1]
 const targetId = location.search.match(/[?&]targetId=([\w\-]+)/)[1]
 const peerId = uuid()
-const peer = new Peer(peerId, peerConfig)
+const peer = new Peer(peerId, { host: host, port: port })
 const conn = peer.connect(targetId)
 
 conn.on('open', function () {
@@ -36,7 +38,7 @@ conn.on('open', function () {
 txtTargetId.textContent = `TargetId: ${targetId}`
 
 fixMacMenu(gui)
-bindHotkeys(window)
+// bindHotkeys(window) // fixme: 冲突
 
 
 navigator.webkitGetUserMedia(mediaConfig, function (stream) {

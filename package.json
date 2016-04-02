@@ -1,6 +1,6 @@
 {
   "name": "nw-remote",
-  "main": "src/main.html",
+  "main": "app://nw-remote/src/main.html",
   "window": {
     "show": false
   },

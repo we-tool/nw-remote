@@ -6,7 +6,6 @@ const vkey = require('vkey')
 const uuid = require('node-uuid')
 const fixMacMenu = require('./util').fixMacMenu
 const bindHotkeys = require('./util').bindHotkeys
-const peerConfig = require('./util').peerConfig
 
 gui.Screen.Init()
 gui.Window.get().focus()
@@ -20,68 +19,11 @@ fixMacMenu(gui)
 bindHotkeys(window)
 
 
-let screenObj
-const peerId = uuid()
-const peer = new Peer(peerId, peerConfig)
-
-peer.on('open', function (id) {
-  console.log('peer onOpen', id)
-})
-
-peer.on('connection', function (conn) {
-  conn.on('open', function () {
-    console.log('conn onOpen')
-  })
-
-  conn.on('data', function (data) {
-    console.log('conn onData', JSON.stringify(data))
-    if (!togAllow.checked) return
-    if (!screenObj) return
-    if (data.mouse) {
-      // 仅适用于"全屏"桌面分享
-      const bounds = screenObj.bounds
-      const x = bounds.x + Math.round(data.x / data.width * bounds.width)
-      const y = bounds.y + Math.round(data.y / data.height * bounds.height)
-      const button = { '1': 'left', '2': 'middle', '3': 'right' }[data.which]
-      robot.moveMouse(x, y)
-      robot.mouseToggle(data.mouse, button)
-      console.log('robot moveMouse', x, y)
-      console.log('robot mouseToggle', data.mouse, button)
-    }
-    if (data.keyCode) {
-      let k = vkey[data.keyCode].toLowerCase()
-      if (k === '<space>') k = ' '
-      const modifiers = []
-      if (data.meta) modifiers.push('command')
-      if (data.ctrl) modifiers.push('control')
-      if (data.alt) modifiers.push('alt')
-      if (data.shift) modifiers.push('shift')
-      if (k[0] !== '<') {
-        console.log('typed ' + k + ' ' + JSON.stringify(modifiers))
-        if (modifiers[0]) robot.keyTap(k, modifiers[0])
-        else robot.keyTap(k)
-      } else {
-        if (k === '<enter>') robot.keyTap('enter')
-        else if (k === '<backspace>') robot.keyTap('backspace')
-        else if (k === '<up>') robot.keyTap('up')
-        else if (k === '<down>') robot.keyTap('down')
-        else if (k === '<left>') robot.keyTap('left')
-        else if (k === '<right>') robot.keyTap('right')
-        else if (k === '<delete>') robot.keyTap('delete')
-        else if (k === '<home>') robot.keyTap('home')
-        else if (k === '<end>') robot.keyTap('end')
-        else if (k === '<page-up>') robot.keyTap('pageup')
-        else if (k === '<page-down>') robot.keyTap('pagedown')
-        else console.log('did not type ' + k)
-      }
-    }
-  })
-})
-
-
 btnJoin.addEventListener('click', function () {
   const targetId = txtTargetId.value.trim()
-  gui.Window.open(`./remote.html?targetId=${targetId}`, {
+  const host = txtHost.value
+  const port = +txtPort.value
+  gui.Window.open(`app:\/\/nw-remote/src/remote.html?host=${host}&port=${port}&targetId=${targetId}`, {
     width: 1000,
     height: 620,
   })
@@ -94,6 +36,66 @@ btnShare.addEventListener('click', function () {
 
   if (hosting) return
   hosting = true
+  
+  let screenObj
+  const host = txtHost.value
+  const port = +txtPort.value
+  const peerId = uuid()
+  const peer = new Peer(peerId, { host: host, port: port })
+
+  peer.on('open', function (id) {
+    console.log('peer onOpen', id)
+  })
+
+  peer.on('connection', function (conn) {
+    conn.on('open', function () {
+      console.log('conn onOpen')
+    })
+
+    conn.on('data', function (data) {
+      console.log('conn onData', JSON.stringify(data))
+      if (!togAllow.checked) return
+      if (!screenObj) return
+      if (data.mouse) {
+        // 仅适用于"全屏"桌面分享
+        const bounds = screenObj.bounds
+        const x = bounds.x + Math.round(data.x / data.width * bounds.width)
+        const y = bounds.y + Math.round(data.y / data.height * bounds.height)
+        const button = { '1': 'left', '2': 'middle', '3': 'right' }[data.which]
+        robot.moveMouse(x, y)
+        robot.mouseToggle(data.mouse, button)
+        console.log('robot moveMouse', x, y)
+        console.log('robot mouseToggle', data.mouse, button)
+      }
+      if (data.keyCode) {
+        let k = vkey[data.keyCode].toLowerCase()
+        if (k === '<space>') k = ' '
+        const modifiers = []
+        if (data.meta) modifiers.push('command')
+        if (data.ctrl) modifiers.push('control')
+        if (data.alt) modifiers.push('alt')
+        if (data.shift) modifiers.push('shift')
+        if (k[0] !== '<') {
+          console.log('typed ' + k + ' ' + JSON.stringify(modifiers))
+          if (modifiers[0]) robot.keyTap(k, modifiers[0])
+          else robot.keyTap(k)
+        } else {
+          if (k === '<enter>') robot.keyTap('enter')
+          else if (k === '<backspace>') robot.keyTap('backspace')
+          else if (k === '<up>') robot.keyTap('up')
+          else if (k === '<down>') robot.keyTap('down')
+          else if (k === '<left>') robot.keyTap('left')
+          else if (k === '<right>') robot.keyTap('right')
+          else if (k === '<delete>') robot.keyTap('delete')
+          else if (k === '<home>') robot.keyTap('home')
+          else if (k === '<end>') robot.keyTap('end')
+          else if (k === '<page-up>') robot.keyTap('pageup')
+          else if (k === '<page-down>') robot.keyTap('pagedown')
+          else console.log('did not type ' + k)
+        }
+      }
+    })
+  })
 
   getMediaSource(function (streamId) {
     console.log('getMediaSource', streamId)
