@@ -82,9 +82,15 @@ btnJoin.addEventListener('click', function () {
 })
 
 
+let hosting = false
+
 btnShare.addEventListener('click', function () {
-  gui.Screen.chooseDesktopMedia(['screen'], function (streamId) {
-    console.log('chooseDesktopMedia', streamId)
+
+  if (hosting) return
+  hosting = true
+
+  getMediaSource(function (streamId) {
+    console.log('getMediaSource', streamId)
     const mediaConfig = {
       audio: false,
       video: {
@@ -113,3 +119,13 @@ btnShare.addEventListener('click', function () {
     })
   })
 })
+
+
+function getMediaSource(callback) {
+  if (gui.Screen.screens.length === 1) {
+    return callback(`screen:${gui.Screen.screens[0].id}`)
+  }
+  gui.Screen.chooseDesktopMedia(['screen'], function (streamId) {
+    callback(streamId)
+  })
+}
