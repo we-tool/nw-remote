@@ -24,9 +24,9 @@ const mediaConfig = {
   }
 }
 
-const host = location.search.match(/[?&]host=([\w\-]+)/)[1]
-const port = +location.search.match(/[?&]port=([\w\-]+)/)[1]
-const targetId = location.search.match(/[?&]targetId=([\w\-]+)/)[1]
+const host = location.search.match(/[?&]host=([^&]+)/)[1]
+const port = +location.search.match(/[?&]port=([^&]+)/)[1]
+const targetId = location.search.match(/[?&]targetId=([^&]+)/)[1]
 const peerId = uuid()
 const peer = new Peer(peerId, { host: host, port: port })
 const conn = peer.connect(targetId)
@@ -35,6 +35,7 @@ conn.on('open', function () {
   console.log('conn onOpen')
 })
 
+txtHostPort.textContent = `${host}:${port}`
 txtTargetId.textContent = `TargetId: ${targetId}`
 
 fixMacMenu(gui)
@@ -49,7 +50,7 @@ navigator.webkitGetUserMedia(mediaConfig, function (stream) {
   // 原因不明 服务器原因? 5秒自动刷新重试
   const reloadTimer = setTimeout(function () {
     location.reload()
-  }, 5000)
+  }, 10000)
 
   call.on('stream', function (stream) {
     clearTimeout(reloadTimer)

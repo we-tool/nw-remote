@@ -117,7 +117,8 @@ btnShare.addEventListener('click', function () {
           chromeMediaSourceId: streamId,
           maxWidth: 1920, // fixme: 更确切的maxWidth/Height
           maxHeight: 1080,
-          maxFrameRate: 60,
+          // maxFrameRate: 60,
+          maxFrameRate: 6,
         }
       }
     }
