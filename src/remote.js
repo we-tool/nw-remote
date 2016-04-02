@@ -2,6 +2,7 @@
 const gui = require('nw.gui')
 const uuid = require('node-uuid')
 const fixMacMenu = require('./util').fixMacMenu
+const bindHotkeys = require('./util').bindHotkeys
 const peerConfig = require('./util').peerConfig
 const isWin32 = require('./util').isWin32
 
@@ -35,12 +36,21 @@ conn.on('open', function () {
 txtTargetId.textContent = `TargetId: ${targetId}`
 
 fixMacMenu(gui)
+bindHotkeys(window)
 
 
 navigator.webkitGetUserMedia(mediaConfig, function (stream) {
   console.log('getUserMedia', stream)
   const call = peer.call(targetId, stream)
+
+  // fixme: 应付偶发的onStream不触发
+  // 原因不明 服务器原因? 5秒自动刷新重试
+  const reloadTimer = setTimeout(function () {
+    location.reload()
+  }, 5000)
+
   call.on('stream', function (stream) {
+    clearTimeout(reloadTimer)
     console.log('call onStream', stream)
     const url = URL.createObjectURL(stream)
     vidScreen.src = url

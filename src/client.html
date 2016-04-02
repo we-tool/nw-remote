@@ -1,9 +1,19 @@
 <!doctype html>
 <meta charset="utf-8">
+<style>
+  label { font-size: 0.7em; }
+  #txtTargetId { width: 140px; }
+  #txtHostId { margin-top: 8px; }
+</style>
 
 <input id="txtTargetId" type="text" placeholder="ID to Connect..." />
 <button id="btnJoin">Join</button>
 <button id="btnShare">Share</button>
+
+<label for="togAllow">
+  <input id="togAllow" type="checkbox" />
+  <span>Allow</span>
+</label>
 <div id="txtHostId"></div>
 
 <script src="../lib/peer.min.js"></script>

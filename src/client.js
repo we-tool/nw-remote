@@ -5,6 +5,7 @@ const robot = require('robotjs')
 const vkey = require('vkey')
 const uuid = require('node-uuid')
 const fixMacMenu = require('./util').fixMacMenu
+const bindHotkeys = require('./util').bindHotkeys
 const peerConfig = require('./util').peerConfig
 
 gui.Screen.Init()
@@ -16,8 +17,10 @@ gui.Window.get().on('closed', function () {
 })
 
 fixMacMenu(gui)
+bindHotkeys(window)
 
 
+let screenObj
 const peerId = uuid()
 const peer = new Peer(peerId, peerConfig)
 
@@ -32,10 +35,13 @@ peer.on('connection', function (conn) {
 
   conn.on('data', function (data) {
     console.log('conn onData', JSON.stringify(data))
+    if (!togAllow.checked) return
+    if (!screenObj) return
     if (data.mouse) {
       // 仅适用于"全屏"桌面分享
-      const x = Math.round(data.x / data.width * screen.width)
-      const y = Math.round(data.y / data.height * screen.height)
+      const bounds = screenObj.bounds
+      const x = bounds.x + Math.round(data.x / data.width * bounds.width)
+      const y = bounds.y + Math.round(data.y / data.height * bounds.height)
       const button = { '1': 'left', '2': 'middle', '3': 'right' }[data.which]
       robot.moveMouse(x, y)
       robot.mouseToggle(data.mouse, button)
@@ -91,6 +97,12 @@ btnShare.addEventListener('click', function () {
 
   getMediaSource(function (streamId) {
     console.log('getMediaSource', streamId)
+    const screenId = +/(\d+)$/.exec(streamId)[1]
+    gui.Screen.screens.some(function (item) {
+      if (item.id === screenId) return screenObj = item
+    })
+    console.log('screenObj', screenObj)
+    
     const mediaConfig = {
       audio: false,
       video: {

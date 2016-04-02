@@ -21,3 +21,16 @@ exports.fixMacMenu = function fixMacMenu(gui) {
     gui.Window.get().menu = mb
   }
 }
+
+exports.bindHotkeys = function bindHotkeys(window) {
+  window.addEventListener('keydown', function (e) {
+    // Cmd/Ctrl+W
+    if ((e.metaKey || e.ctrlKey) && e.keyCode === 87) {
+      return window.close()
+    }
+    // Cmd/Ctrl+R
+    if ((e.metaKey || e.ctrlKey) && e.keyCode === 82) {
+      return window.location.reload()
+    }
+  })
+}
